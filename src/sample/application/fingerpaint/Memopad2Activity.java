@@ -1,8 +1,9 @@
-package sample.application.memopad;
+package sample.application.fingerpaint;
 
 
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,17 +35,19 @@ public class Memopad2Activity extends Activity {
 		// TODO 自動生成されたメソッド・スタブ
     	MenuInflater mi = this.getMenuInflater();
     	mi.inflate(R.menu.menu,menu);
+    	
+    	Absn abs = new Abs(10);
+    	abs.sage();
+    	Log.d("abs",String.valueOf(abs.i));
+    	
+    	abs = new Abs2(10);
+    	abs.sage();
+    	Log.d("abs2",String.valueOf(abs.i));
+    	
+    	
 		return super.onCreateOptionsMenu(menu);
 		
 	}
-    
-    
-    
-    
-    
-    
-    
-    
     
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
