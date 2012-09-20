@@ -4,19 +4,32 @@ package sample.application.fingerpaint;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.os.Bundle;
 
 //追記
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.text.Selection;
 
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import java.text.DateFormat;
 //import android.text.format.DateFormat;名称被り
 import java.util.Date;
@@ -27,7 +40,8 @@ import java.util.Date;
 
 
 //Memopad2Activityクラス定義 extends 拡張　android.app.Activity（スーパークラス）
-public class Memopad2Activity extends Activity {
+public class Memopad2Activity extends Activity{
+
 	
 	//メニューを開く（だけ）
     @Override
@@ -102,8 +116,11 @@ public class Memopad2Activity extends Activity {
     	SharedPreferences pref = this.getSharedPreferences("MemoPrefs", MODE_PRIVATE);
     	et.setText(pref.getString("memo", ""));
     	et.setSelection(pref.getInt("cursor",0));
+    	
+        
     }
-    
+	
+	
     //バックグラウンド字に実行
     @Override
     protected void onStop(){
