@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Bitmap.CompressFormat;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Display;
@@ -33,6 +35,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	public Bitmap bitmap;
 	public Float x1,y1;
 	Integer w,h;
+	public MediaScannerConnection mc;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -123,6 +126,13 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 				editor.commit();
 				
 			}
+			
+			if(writeImage(file)){
+				this.scanMedia(file.getPath());
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putInt("imageNumber", imageNumber);
+				editor.commit();
+			}
 		}
 	}
 	
@@ -168,8 +178,38 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
+
+
+	public void scanMedia(final String fp){
+		this.mc = new MediaScannerConnection(this,
+				new MediaScannerConnection.MediaScannerConnectionClient() {
+
+
+			@Override
+			public void onScanCompleted(String path, Uri uri) {
+				// TODO 自動生成されたメソッド・スタブ
+				disconnect();
+			}
+
+			@Override
+			public void onMediaScannerConnected() {
+				// TODO 自動生成されたメソッド・スタブ
+
+
+				scanFile(fp);
+			}
+		});
+		this.mc.connect();
+	}
+
+	public void scanFile(String fp){
+		this.mc.scanFile(fp, "image/png");
+	}
+	public void disconnect(){
+		this.mc.disconnect();
+	}
+
+
 }
 
 
