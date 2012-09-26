@@ -5,11 +5,16 @@ import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Bitmap.CompressFormat;
@@ -17,7 +22,9 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +33,17 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+
+/*
+ * new AlertDialog.Builder　で外部のインスタスメソッドを呼び出している　インナークラスの特権か　thisだとエラーになる（インスタンスが違うため）
+ * 
+ * AlertDialog以降がonOptionsItem　case:R.id.menu_newに類似纏められる？
+ * なんらかのキーが押された場合 キーボード含みっぽい
+ * 
+ * AlertDialog.Builder ab = new AlertDialog.Builder(this);はメソッドチェーンに改築
+ * 
+ * onOptionsItemSelected(MenuItem)のcase文ながくね？
+ */
 
 public class FingerPaintActivity extends Activity implements OnTouchListener{
 		
@@ -37,6 +55,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	Integer w,h;
 	public MediaScannerConnection mc;
 	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -45,7 +64,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		ImageView iv = (ImageView)this.findViewById(R.id.imageview1);
         Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         
-        /* ��������
+        /* ��������
         WindowManager wm = (WindowManager)this.getSystemService(Context.WIFI_SERVICE);
         Display disp = wm.getDefaultDisplay();
         */
@@ -113,6 +132,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 			DecimalFormat form = new DecimalFormat("0000");
 			String path = Environment.getExternalStorageDirectory()+"/mypaint/";
 			File outDir = new File(path);
+			Log.d("save",path);
 			if(!outDir.exists())
 				outDir.mkdir();
 			do{
@@ -148,7 +168,33 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		}
 		return true;
 	}
-	
+		@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO 自動生成されたメソッド・スタブ
+		
+		if(keyCode == KeyEvent.KEYCODE_BACK){//バックキーが押されたとき
+			new AlertDialog.Builder(this).setTitle(R.string.title_exit).setMessage(R.string.confirm_new)
+			.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO 自動生成されたメソッド・スタブ
+					
+					finish();
+				}
+			}).setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO 自動生成されたメソッド・スタブ
+					;
+				}
+			}).show();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
 	public boolean externalMediaChecker(){
 		boolean result = false;
 		String status = Environment.getExternalStorageState();
@@ -160,20 +206,79 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		// TODO �����������ꂽ���\�b�h�E�X�^�u
 		
 		MenuInflater mi = getMenuInflater();
-		mi.inflate(R.menu.menu_f, menu);
+		mi.inflate(R.menu.menu, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		// TODO �����������ꂽ���\�b�h�E�X�^�u
 		
 		switch (item.getItemId()) {
 		case R.id.menu_save:
 			this.save();
+			break;
+		
+		case R.id.menu_open:
+		
+			Intent intent = new Intent(this,FilePicker.class);
+			startActivityForResult(intent, 0);
+			break;
+		case R.id.menu_color_change:
+			final String[] items = getResources().getStringArray(R.array.ColorName);
+			final int[] colors = getResources().getIntArray(R.array.Color);//Integer[]だと受け取れなかった
+			/*
+			AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string.menu_color_change);
+			ab.setItems(items, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int item) {
+					// TODO 自動生成されたメソッド・スタブ
+				
+					paint.setColor(colors[item]);
+				}
+			});
+			ab.show();
+			メソッドチェーンにしてみる
+			*/
+			
+			//AlertDialog.Builder(this)の戻り値はインスタンス変数？になるからメソッドチェーン可能？
+			new AlertDialog.Builder(this).setTitle(R.string.menu_color_change).setItems(items, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int item) {
+					// TODO 自動生成されたメソッド・スタブ
+					paint.setColor(colors[item]);
+				}
+			}).show();
+			
+			break;
+			
+		case R.id.menu_new:
+			new AlertDialog.Builder(this).setTitle(R.string.menu_new).setMessage(R.string.confirm_new)
+			.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO 自動生成されたメソッド・スタブ
+					
+					canvas.drawColor(Color.WHITE);
+					((ImageView)findViewById(R.id.imageview1)).setImageBitmap(bitmap);
+					
+				}
+			})
+			.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO 自動生成されたメソッド・スタブ
+					;
+				}
+			}).show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -187,13 +292,13 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 			@Override
 			public void onScanCompleted(String path, Uri uri) {
-				// TODO �����������ꂽ���\�b�h�E�X�^�u
+				// TODO �����������ꂽ���\�b�h�E�X�^�u
 				disconnect();
 			}
 
 			@Override
 			public void onMediaScannerConnected() {
-				// TODO �����������ꂽ���\�b�h�E�X�^�u
+				// TODO �����������ꂽ���\�b�h�E�X�^�u
 
 
 				scanFile(fp);
@@ -208,6 +313,58 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	public void disconnect(){
 		this.mc.disconnect();
 	}
+	
+	public Bitmap loadImage(String path){
+		Boolean landscape = false;
+		Bitmap bm;
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path,options);
+		Integer oh = options.outHeight;
+		Integer ow = options.outWidth;
+		
+		if(ow>oh){
+			landscape = true;
+			oh = options.outWidth;
+			ow = options.outHeight;
+		}
+		
+		options.inJustDecodeBounds = false;
+		options.inSampleSize = Math.max(ow/w, oh/h);
+		bm = BitmapFactory.decodeFile(path,options);
+		
+		if(landscape){
+			Matrix matrix = new Matrix();
+			matrix.setRotate(90.0f);
+			bm = Bitmap.createBitmap(bm,0,0,bm.getWidth(),bm.getHeight(),matrix,false);
+			Log.d("bitmap","回転しました");
+		}
+		
+		bm = Bitmap.createScaledBitmap(bm, (int)(w), (int)(w*(((double)oh)/((double)ow))),false);
+		Bitmap offBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
+		Canvas offCanvas = new Canvas(offBitmap);
+		offCanvas.drawBitmap(bm, 0,(h-bm.getHeight())/2,null);
+		bm = offBitmap;
+		return bm;
+			
+		}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if(resultCode == RESULT_OK){
+			this.bitmap = loadImage(data.getStringExtra("fu"));
+			this.canvas = new Canvas(this.bitmap);
+			ImageView iv =(ImageView)this.findViewById(R.id.imageview1);
+			iv.setImageBitmap(this.bitmap);
+		}
+		
+	}
+		
+	
 
 
 }

@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -20,31 +21,32 @@ import android.widget.ListView;
 
 public class FilePicker extends ListActivity {
 
-	String dir,externalStorageDir;
-	FileFilter fFileter;
-	Comparator<Object> comparator;
+	public String dir,externalStorageDir;
+	public FileFilter fFileter;
+	public Comparator<Object> comparator;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.filelist);
-		externalStorageDir = Environment.getExternalStorageDirectory().toString();
+		setContentView(R.layout.filelist);//filelist.xmlå†…ã®listviewã®IDã‚’å¤‰ãˆãªã„ã¨ã‚¨ãƒ©ãƒ¼è½ã¡
+		this.externalStorageDir = Environment.getExternalStorageDirectory().toString();
+		Log.d("filePicker",Environment.getExternalStorageDirectory().toString());
 		/*dir = externalStorageDir+"/text";
 		SharedPreferences pref = this.getSharedPreferences("MemoFilePickerPrefs", MODE_PRIVATE);
 		this.dir =pref.getString("Folder", externalStorageDir+"/text");
 		*/
 		
-		SharedPreferences pref = this.getSharedPreferences("MemoFilePickerPrefs", MODE_PRIVATE);
+		SharedPreferences pref = this.getSharedPreferences("FilePickerPrefs", MODE_PRIVATE);
 		this.dir =pref.getString("Folder", externalStorageDir+"/mypaint");
 		
-		makeFileFilter();
-		makeCompatator();
-		showList();
+		this.makeFileFilter();
+		this.makeCompatator();
+		this.showList();
 	}
 	
 	@Override
 	protected void onStop() {
-		// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 		super.onStop();
 		
 		//SharedPreferences pref = this.getSharedPreferences("MeomoFilePickerPrefs", MODE_PRIVATE);
@@ -55,11 +57,11 @@ public class FilePicker extends ListActivity {
 	}
 
 	public void makeFileFilter(){
-		fFileter = new FileFilter() {
+		this.fFileter = new FileFilter() {
 			
 			@Override
 			public boolean accept(File file) {
-				// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+				// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 				//Pattern p = Pattern.compile
 				//		("\\.txt$|\\.ini$|\\.xml$|\\.htm$|\\.csv$|\\.java$",Pattern.CASE_INSENSITIVE);
 				
@@ -74,7 +76,7 @@ public class FilePicker extends ListActivity {
 	}
 	
 	public void makeCompatator(){
-		comparator = new Comparator<Object>() {
+		this.comparator = new Comparator<Object>() {
 			public int compare(Object object1,Object object2){
 				Integer pad1 = 0;
 				Integer pad2 = 0;
@@ -88,16 +90,16 @@ public class FilePicker extends ListActivity {
 	}
 	
 	public void showList(){
-		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED));
+		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 			this.finish();
 		File file = new File(this.dir);
 		if(!file.exists()){
-			this.dir = externalStorageDir;
+			this.dir = this.externalStorageDir;
 			file = new File(this.dir);
 		}
 		
 		this.setTitle(this.dir);
-		File[] fc = file.listFiles(fFileter);
+		File[] fc = file.listFiles(this.fFileter);
 		final FileListAdapter adapter = new FileListAdapter(this,fc);
 		adapter.sort(this.comparator);
 		ListView lv = (ListView)findViewById(android.R.id.list);
@@ -107,7 +109,7 @@ public class FilePicker extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+				// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 				
 				if(((File)adapter.getItem(position)).isDirectory()){
 					dir = ((File)adapter.getItem(position)).getPath();
@@ -133,6 +135,16 @@ public class FilePicker extends ListActivity {
 	public void upButtonClick(View v){
 		this.dir = new File(this.dir).getParent();
 		this.showList();
+	}
+	
+	public void dirButtonClick(View v){
+		if(v.getId() == R.id.button1){
+			this.dir = new File(this.dir).getParent();
+			this.showList();
+		}else{
+			this.dir = new File(Environment.getExternalStorageDirectory().toString() + "/mypaint").getPath();
+			this.showList();
+		}
 	}
 	
 }

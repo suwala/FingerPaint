@@ -1,4 +1,3 @@
-("¥¥.png$|¥¥.jpg$|¥¥.git$|¥¥.jpeg$|¥¥.bmp$("¥¥.png$|¥¥.jpg$|¥¥.git$|¥¥.jpeg$|¥¥.bmp$("¥¥.png$|¥¥.jpg$|¥¥.git$|¥¥.jpeg$|¥¥.bmp$("¥¥.png$|¥¥.jpg$|¥¥.git$|¥¥.jpeg$|¥¥.bmp$("¥¥.png$|¥¥.jpg$|¥¥.git$|¥¥.jpeg$|¥¥.bmp$  <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>  <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>  <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>  <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>  <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:id="@+id/menu_save" android:title="@string/menu_save"></item>
     

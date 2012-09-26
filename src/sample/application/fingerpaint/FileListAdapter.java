@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore.Images.ImageColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +19,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FileListAdapter extends ArrayAdapter<Object> {
-	public static final Integer text1 = android.R.id.text1;
+	/*
+	public static final int text1 = android.R.id.text1;ã‚¨ãƒ©ãƒ¼ãŒã§ã‚‹ã®ã§å€¤ã‚’å¤‰æ›´
 	public static final Integer text2 = android.R.id.text2;
 	public static final Integer icon = android.R.id.icon;
+	*/
+	
+	public static final Integer text1 = R.id.text1;
+	public static final Integer text2 = R.id.text2;
+	public static final Integer icon = R.id.icon;
 	
 	public File[] fc;
 	public LayoutInflater mInflater;
 	
 	public FileListAdapter(Context context,Object[] objects) {
 		super(context, text1, objects);
-		// TODO ©“®¶¬‚³‚ê‚½ƒRƒ“ƒXƒgƒ‰ƒNƒ^[EƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½Eï¿½Xï¿½^ï¿½u
 		
 		this.fc = (File[])objects;
 		this.mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -35,21 +42,23 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// TODO ©“®¶¬‚³‚ê‚½ƒƒ\ƒbƒhEƒXƒ^ƒu
+		// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½Eï¿½Xï¿½^ï¿½u
 		if(convertView == null){
 			//convertView = this.mInflater.inflate(R.layout.list_item_with_icon,null);
-			convertView = this.mInflater.inflate(android.R.layout.simple_list_item_1,null);
+			convertView = this.mInflater.inflate(R.layout.list_item_with_icon,null);
 		}
 		
-		TextView fName = (TextView)convertView.findViewById(this.text1);
-		TextView fTime = (TextView)convertView.findViewById(this.text2);
-		ImageView fIcon = (ImageView)convertView.findViewById(this.icon);
+		TextView fName = (TextView)convertView.findViewById(text1);//FileListAdapterã¯findViewByIdã‚’ç¶™æ‰¿ã—ã¦ãªã„ã‚‰ã—ã„
+		TextView fTime = (TextView)convertView.findViewById(text2);
+		ImageView fIcon = (ImageView)convertView.findViewById(icon);
 		
-		fName.setText(fc[position].getName());
+		
+		//fName.setText("test");//ã¬ã‚‹ã½ãŒå‡ºã‚‹ã€€fNameãŒã¬ã‚‹ã£ã½ã„
+		fName.setText(this.fc[position].getName());
 		fTime.setText(DateFormat.getDateTimeInstance().format(
-				new Date(fc[position].lastModified())));
+				new Date(this.fc[position].lastModified())));
 		
-		if(fc[position].isDirectory()){
+		if(this.fc[position].isDirectory()){
 			fIcon.setImageResource(R.drawable.folder);
 		}else{
 			//fIcon.setImageResource(R.drawble.text);
@@ -76,11 +85,6 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 			}
 		}
 		return convertView;
-	}
-	
-	
-
-	
-	
+	}	
 	
 }
