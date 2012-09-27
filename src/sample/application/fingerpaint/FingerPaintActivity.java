@@ -2,6 +2,7 @@ package sample.application.fingerpaint;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import android.app.Activity;
@@ -18,6 +19,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,15 +37,11 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
 /*
- * new AlertDialog.Builder　で外部のインスタスメソッドを呼び出している　インナークラスの特権か　thisだとエラーになる（インスタンスが違うため）
- * 
- * AlertDialog以降がonOptionsItem　case:R.id.menu_newに類似纏められる？
- * なんらかのキーが押された場合 キーボード含みっぽい
- * 
- * AlertDialog.Builder ab = new AlertDialog.Builder(this);はメソッドチェーンに改築
- * 
- * onOptionsItemSelected(MenuItem)のcase文ながくね？
- */
+ * new AlertDialog.Builder縲�〒螟夜Κ縺ｮ繧､繝ｳ繧ｹ繧ｿ繧ｹ繝｡繧ｽ繝�ラ繧貞他縺ｳ蜃ｺ縺励※縺�ｋ縲�う繝ｳ繝翫�繧ｯ繝ｩ繧ｹ縺ｮ迚ｹ讓ｩ縺九�this縺�→繧ｨ繝ｩ繝ｼ縺ｫ縺ｪ繧具ｼ医う繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ縺碁＆縺�◆繧�ｼ� * 
+ * AlertDialog莉･髯阪′onOptionsItem縲�ase:R.id.menu_new縺ｫ鬘樔ｼｼ郤上ａ繧峨ｌ繧具ｼ� * 縺ｪ繧薙ｉ縺九�繧ｭ繝ｼ縺梧款縺輔ｌ縺溷�蜷�繧ｭ繝ｼ繝懊�繝牙性縺ｿ縺｣縺ｽ縺� * 
+ * AlertDialog.Builder ab = new AlertDialog.Builder(this);縺ｯ繝｡繧ｽ繝�ラ繝√ぉ繝ｼ繝ｳ縺ｫ謾ｹ遽� * 
+ * BitmapとDrawableの違い
+ * onOptionsItemSelected(MenuItem)縺ｮcase譁�↑縺後￥縺ｭ�� */
 
 public class FingerPaintActivity extends Activity implements OnTouchListener{
 		
@@ -64,7 +62,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		ImageView iv = (ImageView)this.findViewById(R.id.imageview1);
         Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         
-        /* ��������
+        /* �ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ
         WindowManager wm = (WindowManager)this.getSystemService(Context.WIFI_SERVICE);
         Display disp = wm.getDefaultDisplay();
         */
@@ -135,7 +133,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 			Log.d("save",path);
 			if(!outDir.exists())
 				outDir.mkdir();
-			do{
+			do{//必ず実行されるwhile文
 				file= new File(path+"img"+form.format(imageNumber)+".png");
 				imageNumber++;
 			}while(file.exists())
@@ -157,37 +155,42 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	}
 	
 	public boolean writeImage(File file){
+		FileOutputStream fo=null;//tryの中では見えないので　外で宣言する
 		try{
-			FileOutputStream fo=new FileOutputStream(file);
+			fo=new FileOutputStream(file);
 			this.bitmap.compress(CompressFormat.PNG, 100, fo);
 			fo.flush();
 			fo.close();
-		}catch(Exception e){
+		}catch(IOException e){//書き込み時にディスクの異常　同一ファイルへアクセス なんかで起きる
 			System.out.println(e.getLocalizedMessage());
-			return false;
+			return false;//FileOutputStreamで開いてるにも拘らず　開いたままエラー処理に走る可能性がある　fo.cloce();をつけるべし
+		}finally{//必ず実行される
+			try {
+				fo.close();
+			} catch (IOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
 		}
 		return true;
 	}
 		@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		// TODO 自動生成されたメソッド・スタブ
-		
-		if(keyCode == KeyEvent.KEYCODE_BACK){//バックキーが押されたとき
+		// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�		
+		if(keyCode == KeyEvent.KEYCODE_BACK){//繝舌ャ繧ｯ繧ｭ繝ｼ縺梧款縺輔ｌ縺溘→縺�			
 			new AlertDialog.Builder(this).setTitle(R.string.title_exit).setMessage(R.string.confirm_new)
 			.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// TODO 自動生成されたメソッド・スタブ
-					
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�					
 					finish();
 				}
 			}).setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// TODO 自動生成されたメソッド・スタブ
-					;
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�					;
 				}
 			}).show();
 			return true;
@@ -206,7 +209,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		// TODO �ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ黷ｽ�ｽ�ｽ�ｽ\�ｽb�ｽh�ｽE�ｽX�ｽ^�ｽu
 		
 		MenuInflater mi = getMenuInflater();
 		mi.inflate(R.menu.menu, menu);
@@ -215,7 +218,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO �����������ꂽ���\�b�h�E�X�^�u
+		// TODO �ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ黷ｽ�ｽ�ｽ�ｽ\�ｽb�ｽh�ｽE�ｽX�ｽ^�ｽu
 		
 		switch (item.getItemId()) {
 		case R.id.menu_save:
@@ -229,7 +232,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 			break;
 		case R.id.menu_color_change:
 			final String[] items = getResources().getStringArray(R.array.ColorName);
-			final int[] colors = getResources().getIntArray(R.array.Color);//Integer[]だと受け取れなかった
+			final int[] colors = getResources().getIntArray(R.array.Color);//Integer[]縺�→蜿励¢蜿悶ｌ縺ｪ縺九▲縺�			
 			/*
 			AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setTitle(R.string.menu_color_change);
@@ -237,22 +240,19 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 				
 				@Override
 				public void onClick(DialogInterface dialog, int item) {
-					// TODO 自動生成されたメソッド・スタブ
-				
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�				
 					paint.setColor(colors[item]);
 				}
 			});
 			ab.show();
-			メソッドチェーンにしてみる
-			*/
+			繝｡繧ｽ繝�ラ繝√ぉ繝ｼ繝ｳ縺ｫ縺励※縺ｿ繧�			*/
 			
-			//AlertDialog.Builder(this)の戻り値はインスタンス変数？になるからメソッドチェーン可能？
+			//AlertDialog.Builder(this)縺ｮ謌ｻ繧雁�縺ｯ繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ螟画焚�溘↓縺ｪ繧九°繧峨Γ繧ｽ繝�ラ繝√ぉ繝ｼ繝ｳ蜿ｯ閭ｽ��			
 			new AlertDialog.Builder(this).setTitle(R.string.menu_color_change).setItems(items, new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int item) {
-					// TODO 自動生成されたメソッド・スタブ
-					paint.setColor(colors[item]);
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�					paint.setColor(colors[item]);
 				}
 			}).show();
 			
@@ -264,8 +264,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// TODO 自動生成されたメソッド・スタブ
-					
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�					
 					canvas.drawColor(Color.WHITE);
 					((ImageView)findViewById(R.id.imageview1)).setImageBitmap(bitmap);
 					
@@ -275,12 +274,11 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// TODO 自動生成されたメソッド・スタブ
-					;
+					// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�					;
 				}
 			}).show();
 			break;
-		}
+			}
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -292,13 +290,13 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 			@Override
 			public void onScanCompleted(String path, Uri uri) {
-				// TODO �����������ꂽ���\�b�h�E�X�^�u
+				// TODO �ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ黷ｽ�ｽ�ｽ�ｽ\�ｽb�ｽh�ｽE�ｽX�ｽ^�ｽu
 				disconnect();
 			}
 
 			@Override
 			public void onMediaScannerConnected() {
-				// TODO �����������ꂽ���\�b�h�E�X�^�u
+				// TODO �ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ�ｽ黷ｽ�ｽ�ｽ�ｽ\�ｽb�ｽh�ｽE�ｽX�ｽ^�ｽu
 
 
 				scanFile(fp);
@@ -338,7 +336,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 			Matrix matrix = new Matrix();
 			matrix.setRotate(90.0f);
 			bm = Bitmap.createBitmap(bm,0,0,bm.getWidth(),bm.getHeight(),matrix,false);
-			Log.d("bitmap","回転しました");
+			Log.d("bitmap","蝗櫁ｻ｢縺励∪縺励◆");
 		}
 		
 		bm = Bitmap.createScaledBitmap(bm, (int)(w), (int)(w*(((double)oh)/((double)ow))),false);
@@ -352,8 +350,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO 自動生成されたメソッド・スタブ
-		super.onActivityResult(requestCode, resultCode, data);
+		// TODO 閾ｪ蜍慕函謌舌＆繧後◆繝｡繧ｽ繝�ラ繝ｻ繧ｹ繧ｿ繝�		super.onActivityResult(requestCode, resultCode, data);
 		
 		if(resultCode == RESULT_OK){
 			this.bitmap = loadImage(data.getStringExtra("fu"));

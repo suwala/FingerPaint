@@ -76,7 +76,7 @@ public class FilePicker extends ListActivity {
 	}
 	
 	public void makeCompatator(){
-		this.comparator = new Comparator<Object>() {
+		this.comparator = new Comparator<Object>(){//インナークラス
 			public int compare(Object object1,Object object2){
 				Integer pad1 = 0;
 				Integer pad2 = 0;

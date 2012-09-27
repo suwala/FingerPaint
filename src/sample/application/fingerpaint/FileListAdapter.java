@@ -25,7 +25,7 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 	public static final Integer icon = android.R.id.icon;
 	*/
 	
-	public static final Integer text1 = R.id.text1;
+	public static final Integer text1 = android.R.id.text1;
 	public static final Integer text2 = R.id.text2;
 	public static final Integer icon = R.id.icon;
 	
@@ -36,8 +36,9 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 		super(context, text1, objects);
 		// TODO �����������ꂽ�R���X�g���N�^�[�E�X�^�u
 		
+		
 		this.fc = (File[])objects;
-		this.mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);//LayoutInflaterとLAYOUT_INFLATER_SERVICEとは
 	}
 
 	@Override
@@ -48,12 +49,16 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 			convertView = this.mInflater.inflate(R.layout.list_item_with_icon,null);
 		}
 		
-		TextView fName = (TextView)convertView.findViewById(text1);//FileListAdapterはfindViewByIdを継承してないらしい
+				
+		TextView fName = (TextView)convertView.findViewById(text1);//FileListAdapterはfindViewByIdを継承してない?
 		TextView fTime = (TextView)convertView.findViewById(text2);
 		ImageView fIcon = (ImageView)convertView.findViewById(icon);
 		
 		
-		//fName.setText("test");//ぬるぽが出る　fNameがぬるっぽい
+		Log.d("",this.fc[position].getName());//img0001.png
+		Log.d("",String.valueOf(text1));//16908308
+		
+		//fName.setText("test");ぬるぽが出る　
 		fName.setText(this.fc[position].getName());
 		fTime.setText(DateFormat.getDateTimeInstance().format(
 				new Date(this.fc[position].lastModified())));
